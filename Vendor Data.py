@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-import json
 
 def get_newest_file(folder_path):
     try:
@@ -37,17 +36,17 @@ def process_vendor_data(file_path):
                 line = line.strip()
 
                 # Démarrage de la section de scan
-                if "[Razor]: Simple Vendor Scan" in line:
+                if "[Razor]: …OutlandMall Start" in line:
                     in_scan_section = True
                     continue
 
                 # Fin de la section de scan
-                if "[Razor]: OutlandMall End" in line:
+                if "[Razor]: …OutlandMall End" in line:
                     break
 
                 if in_scan_section:
                     # Détection du début d'un vendeur
-                    if "[Razor]: Start" in line:
+                    if "[Razor]: …vendorStart" in line:
                         parts = line.split()
                         # Vérifier qu'on a bien au moins 6 éléments (par exemple : "[Razor]:", "Start", "<timestamp>", "<ID>", "<vendor_id>", "<vendor_name>")
                         if len(parts) < 6:
@@ -59,7 +58,7 @@ def process_vendor_data(file_path):
                         continue
 
                     # Fin d'un vendeur
-                    if "[Razor]: End" in line and current_vendor:
+                    if "[Razor]: …vendorEnd" in line and current_vendor:
                         vendors.append(current_vendor)
                         current_vendor = None
                         continue
@@ -74,23 +73,25 @@ def process_vendor_data(file_path):
                         continue
 
                     # Extraction des articles
-                    if "[Razor]: Item:" in line and current_vendor:
+                    if "[Razor]: …item" in line and current_vendor:
+                        # Filtre les tags inutiles
+                        line = line.replace("(used to increase a player's skill cap for a skill by 1)", "")
                         # Vérifier si la ligne contient "|| Stack Price:" ou "|| Price:"
-                        if "|| Stack Price:" in line:
-                            parts = line.split("|| Stack Price:")
+                        if " Stack Price:" in line:
+                            parts = line.split(" Stack Price:")
                             is_stack = True
-                        elif "|| Price:" in line:
-                            parts = line.split("|| Price:")
+                        elif " Price:" in line:
+                            parts = line.split(" Price:")
                             is_stack = False
                         else:
                             print(f"Error at line {line_num}: Missing price information in item line: {line}")
                             continue
 
                         item_id_part = parts[0].strip().split()
-                        if len(item_id_part) < 3:
+                        if len(item_id_part) < 4:
                             print(f"Error at line {line_num}: Malformed item ID in line: {line}")
                             continue
-                        item_id = item_id_part[4]  # Ajuster l'indice selon le format réel
+                        item_id = item_id_part[5]  # Ajuster l'indice selon le format réel
 
                         price_desc = parts[1].strip()
 
