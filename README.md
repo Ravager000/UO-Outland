@@ -7,6 +7,7 @@ Vendor Data.py     **Output Sample**
 --------------------------------------------------
 Vendor: Pale Dim's Butler (ID: 1703153)
 Location: (3713, 3466, 69) 161° 53'S, 168° 2'E
+
 Inventory:
   - Item ID: 1242896983, Stack Price: 47000, Description: Artisan Aspect Core, Amount: 20
   - Item ID: 1244295956, Price: 90000, Description: invulnerability leather cap
