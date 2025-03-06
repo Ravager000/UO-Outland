@@ -50,3 +50,72 @@ journal_inventory_summary.txt
 Overall Total Value: 201433
 
 ===============================================================
+
+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+journal_inventory_summary.json
+{
+    "inventory": {
+        "flesh iron cannon metal ship upgrade (2,500 base doubloon cost)": {
+            "amount": 1,
+            "prices": [
+                170000
+            ],
+            "total_value": 170000,
+            "avg_unit_price": 170000.0
+        },
+        "alchemy skill mastery scroll": {
+            "amount": 4,
+            "prices": [
+                60000,
+                52500
+            ],
+            "total_value": 225000,
+            "avg_unit_price": 56250.0
+        },
+                "leather": {
+            "amount": 15,
+            "prices": [
+                666
+            ],
+            "total_value": 9990,
+            "avg_unit_price": 666.0
+        }
+    },
+    "total_value": 20143326
+}
+
+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+journal_processed.json
+{
+        "id": "3588345",
+        "name": "Dee",
+        "location": "(3714, 3470, 69) 162° 14'S, 168° 7'E",
+        "items": [
+            {
+                "id": "1397679375",
+                "price": "170000",
+                "description": "flesh iron cannon metal ship upgrade (2,500 base doubloon cost)",
+                "amount": "1"
+            },
+            {
+                "id": "1397722479",
+                "price": "130000",
+                "description": "sentry outfitting ship upgrade (5,000 base doubloon cost)",
+                "amount": "1"
+            },
+            {
+                "id": "1115214261",
+                "stack_price": "5000",
+                "description": "rare cloth (hue 1939: dark crimson)",
+                "amount": "2"
+            },
+            {
+                "id": "1231491190",
+                "stack_price": "18000",
+                "description": "herding skill mastery scroll",
+                "amount": "8"
+            },
+         ]
+    },
