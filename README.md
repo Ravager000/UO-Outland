@@ -33,6 +33,7 @@ Inventory:
 
 
 journal_inventory_summary.txt
+
 ====================== Inventory Summary ======================
 
 - Item Description: water phylactery, Total Amount: 1, Prices: [99999], Average Unit Price: 99999.0, Total Value: 99999
