@@ -9,10 +9,7 @@ def get_newest_outland_journal_file(folder_path):
             print(f"No .txt files found in {folder_path}")
             return None
         
-        newest_file = max(
-            text_files,
-            key=lambda f: os.path.getmtime(os.path.join(folder_path, f))
-        )
+        newest_file = max(text_files,key=lambda f: os.path.getmtime(os.path.join(folder_path, f)))
         return os.path.join(folder_path, newest_file)
     except FileNotFoundError:
         print(f"Error: The folder '{folder_path}' does not exist.")
@@ -23,18 +20,25 @@ def get_newest_outland_journal_file(folder_path):
     except Exception as e:
         print(f"Error accessing folder '{folder_path}': {e}")
         return None
-import os
 
-def get_latest_inventory_summary_file(directory):
-    # List files that contain base_name and end with .json
-    files = [f for f in os.listdir(directory) if "inventory_summary" in f and f.endswith(".json")]
-    if files:
-        # Find the file with the latest modification time
-        latest_file = max(files, key=lambda x: os.path.getmtime(os.path.join(directory, x)))
-        return os.path.join(directory, latest_file)
-    print(f"Latest file: {latest_file}")
-    return None
-
+def get_latest_inventory_summary_file(folder_path):
+    try:# List files that contain base_name and end with .json
+        files = [f for f in os.listdir(folder_path) if "inventory_summary" in f and f.endswith(".json")]
+        if not files:
+            print(f"No .txt files found in {folder_path}")
+            return
+            # Find the file with the latest modification time
+        latest_file = max(files, key=lambda x: os.path.getmtime(os.path.join(folder_path, x)))
+        return os.path.join(folder_path, latest_file)
+    except FileNotFoundError:
+        print(f"Error: The folder '{folder_path}' does not exist.")
+        return None
+    except PermissionError:
+        print(f"Error: Permission denied to access '{folder_path}'.")
+        return None
+    except Exception as e:
+        print(f"Error accessing folder '{folder_path}': {e}")
+        return None
 
 def process_vendor_data(file_path):
     vendors = []
