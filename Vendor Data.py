@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 import json
 
-def get_newest_file(folder_path):
+def get_newest_outland_journal_file(folder_path):
     try:
         text_files = [f for f in os.listdir(folder_path) if f.endswith('.txt')]
         if not text_files:
@@ -23,6 +23,18 @@ def get_newest_file(folder_path):
     except Exception as e:
         print(f"Error accessing folder '{folder_path}': {e}")
         return None
+import os
+
+def get_latest_inventory_summary_file(directory):
+    # List files that contain base_name and end with .json
+    files = [f for f in os.listdir(directory) if "inventory_summary" in f and f.endswith(".json")]
+    if files:
+        # Find the file with the latest modification time
+        latest_file = max(files, key=lambda x: os.path.getmtime(os.path.join(directory, x)))
+        return os.path.join(directory, latest_file)
+    print(f"Latest file: {latest_file}")
+    return None
+
 
 def process_vendor_data(file_path):
     vendors = []
@@ -180,7 +192,7 @@ def save_vendor_data(vendors, output_dir, input_file_name):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d")
         base_name = os.path.splitext(os.path.basename(input_file_name))[0]
         output_file = os.path.join(output_dir, f"{base_name}_processed_{timestamp}.txt")
 
@@ -216,7 +228,7 @@ def save_inventory_data(inventory_summary, total_inventory_value, output_dir, in
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d")
         base_name = os.path.splitext(os.path.basename(input_file_name))[0]
         output_file = os.path.join(output_dir, f"{base_name}_inventory_summary_{timestamp}.txt")
 
@@ -226,7 +238,7 @@ def save_inventory_data(inventory_summary, total_inventory_value, output_dir, in
             f.write("====================== Inventory Summary ======================\n\n")
             for description, details in inventory_summary.items():
                 prices_str = ', '.join(str(p) for p in details['prices'])
-                f.write(f"- Item Description: {description}, Total Amount: {details['amount']}, Prices: [{prices_str}], Average Unit Price: {details['avg_unit_price']:.1f}, Total Value: {details['total_value']}\n")
+                f.write(f"- Item Description: {description}, Total Amount: {details['amount']}, Prices: [{prices_str}], Average Price: {details['avg_unit_price']:.1f}, Total Value: {details['total_value']}\n")
             
             f.write(f"\nOverall Total Value: {total_inventory_value}\n")
             f.write("\n===============================================================")
@@ -352,7 +364,7 @@ def main():
         print(f"Error: Input folder '{input_folder_path}' does not exist. Please check the path.")
         return
 
-    newest_file = get_newest_file(input_folder_path)
+    newest_file = get_newest_outland_journal_file(input_folder_path)
     if not newest_file:
         print("No further processing due to missing files or access issues.")
         return
