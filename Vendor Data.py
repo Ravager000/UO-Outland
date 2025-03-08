@@ -196,9 +196,8 @@ def save_vendor_data(vendors, output_dir, input_file_name):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y-%m-%d")
-        base_name = os.path.splitext(os.path.basename(input_file_name))[0]
-        output_file = os.path.join(output_dir, f"{base_name}_processed_{timestamp}.txt")
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H")
+        output_file = os.path.join(output_dir, f"{input_file_name}_processed_{timestamp}.txt")
 
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(f"Processed Vendor Data from {input_file_name}\n")
@@ -232,9 +231,8 @@ def save_inventory_data(inventory_summary, total_inventory_value, output_dir, in
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y-%m-%d")
-        base_name = os.path.splitext(os.path.basename(input_file_name))[0]
-        output_file = os.path.join(output_dir, f"{base_name}_inventory_summary_{timestamp}.txt")
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H")   
+        output_file = os.path.join(output_dir, f"{input_file_name}_inventory_summary_{timestamp}.txt")
 
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(f"Processed Vendor Data from {input_file_name}\n")
@@ -286,9 +284,8 @@ def save_vendor_data_json(vendors, output_dir, input_file_name):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        base_name = os.path.splitext(os.path.basename(input_file_name))[0]
-        output_file = os.path.join(output_dir, f"{base_name}_processed_{timestamp}.json")
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H") 
+        output_file = os.path.join(output_dir, f"{input_file_name}_processed_{timestamp}.json")
 
         with open(output_file, 'w', encoding='utf-8') as json_file:
             json.dump(vendors, json_file, indent=4, ensure_ascii=False)
@@ -347,9 +344,8 @@ def save_inventory_json(inventory_summary, total_value, output_dir, input_file_n
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        base_name = os.path.splitext(os.path.basename(input_file_name))[0]
-        output_file = os.path.join(output_dir, f"{base_name}_inventory_summary_{timestamp}.json")
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H")
+        output_file = os.path.join(output_dir, f"{input_file_name}_inventory_summary_{timestamp}.json")
         
         with open(output_file, 'w', encoding='utf-8') as json_file:
             json.dump({"inventory": inventory_summary, "total_value": total_value}, json_file, indent=4, ensure_ascii=False)
@@ -374,39 +370,50 @@ def main():
         return
 
     print(f"Processing file: {newest_file}")
+    base_name = os.path.splitext(os.path.basename(newest_file))[0]
     
     vendors = process_vendor_data(newest_file)
     if vendors is None:
         print("Processing failed. Check error messages above.")
         return
     
-    saved_file = save_vendor_data(vendors, output_directory, newest_file)
+    # Optional: Comment out the following lines to skip displaying the data
+    display_vendor_data(vendors)
+    
+    # Optional: Filter vendors by a specific tag
+    filter_tag=None # "A+"
+    
+    if filter_tag:
+        vendors[:] = [vendor for vendor in vendors if filter_tag in vendor["name"]]
+        base_name += f"_{filter_tag}"
+     
+    inventory_summary, total_inventory_value = summarize_inventory(vendors)
+    if inventory_summary is None:
+        print("Error: Failed to summarize inventory.")
+        return 
+        
+    # Optional: Comment out the following lines to skip displaying the data
+    display_inventory_data(inventory_summary, total_inventory_value)
+    
+    saved_file = save_vendor_data(vendors, output_directory, base_name)
     if not saved_file:
         print("Failed to save the data. Check error messages above.")
         return
     
-    json_file = save_vendor_data_json(vendors, output_directory, newest_file)
+    json_file = save_vendor_data_json(vendors, output_directory, base_name)
     if not json_file:
         print("Failed to save the JSON data. Check error messages above.")
         return
     
-    inventory_summary, total_inventory_value = summarize_inventory(vendors)
-    if inventory_summary is None:
-        print("Error: Failed to summarize inventory.")
-        return
-    
-    inventory_json = save_inventory_json(inventory_summary, total_inventory_value, output_directory, newest_file)
+    inventory_json = save_inventory_json(inventory_summary, total_inventory_value, output_directory, base_name)
     if not inventory_json:
         print("Failed to save the inventory summary. Check error messages above.")
         return
     
-    inventory_data = save_inventory_data(inventory_summary, total_inventory_value, output_directory, newest_file)
+    inventory_data = save_inventory_data(inventory_summary, total_inventory_value, output_directory, base_name)
     if not inventory_data:
         print("Failed to save the inventory summary. Check error messages above.")
         return
-    
-    display_vendor_data(vendors)
-    display_inventory_data(inventory_summary, total_inventory_value)
 
 if __name__ == "__main__":
     main()
