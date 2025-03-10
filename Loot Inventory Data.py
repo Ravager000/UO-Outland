@@ -124,7 +124,7 @@ def display_inventory_data(items,merged_items):
     print("\n====================== Inventory Summary ======================")
     print(f"Found {len(items)} total items, merged into {len(merged_items)} unique items.\n")
     for item in merged_items:
-        print(f"(ID: {item['id']}),  {item['description']}, Amount: {item['amount']}")
+        print(f"(ID: {item['id']})  {item['description']}, Amount: {item['amount']}")
         
     print("\n===============================================================")
 
@@ -142,7 +142,7 @@ def save_Items_data(items,merged_items, output_dir, input_file_name):
             f.write("====================== Inventory Summary ======================\n")
             f.write(f"Found {len(items)} total items, merged into {len(merged_items)} unique items.\n\n")
             for item in merged_items:
-                f.write(f"(ID: {item['id']}),  {item['description']}, Amount: {item['amount']}\n")
+                f.write(f"(ID: {item['id']})  {item['description']}, Amount: {item['amount']}\n")
         
             f.write("\n===============================================================")
             

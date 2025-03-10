@@ -215,9 +215,9 @@ def save_vendor_data(vendors, output_dir, input_file_name):
                 if vendor['items']:
                     for item in vendor['items']:
                         if "stack_price" in item:
-                            f.write(f"  - Item (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}\n")
+                            f.write(f"  - Item (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}\n")
                         else:
-                            f.write(f"  - Item (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}\n")
+                            f.write(f"  - Item (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}\n")
                 else:
                     f.write("  No items listed\n")
                 f.write("-" * 50 + "\n")
@@ -268,9 +268,9 @@ def display_vendor_data(vendors):
         if vendor['items']:
             for item in vendor['items']:
                 if "stack_price" in item:
-                    print(f"  - Item (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                    print(f"  - Item (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
                 else:
-                    print(f"  - Item (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+                    print(f"  - Item (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
         else:
             print("  No items listed")
         print("-" * 50)
@@ -302,9 +302,9 @@ def print_vendor_changes(changes):
                 print("    Items:")
                 for item in vendor["items"]:
                     if "stack_price" in item:
-                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                        print(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
                     else:
-                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+                        print(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
             else:
                 print("    Items: None")
     
@@ -318,9 +318,9 @@ def print_vendor_changes(changes):
                 print("    Items:")
                 for item in vendor["items"]:
                     if "stack_price" in item:
-                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                        print(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
                     else:
-                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+                        print(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
             else:
                 print("    Items: None")
     
@@ -336,24 +336,26 @@ def print_vendor_changes(changes):
                 print("    Added Items:")
                 for item in vendor_changes["added_items"]:
                     if "stack_price" in item:
-                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                        print(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
                     else:
-                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+                        print(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
             
             if vendor_changes["removed_items"]:
                 print("    Removed Items:")
                 for item in vendor_changes["removed_items"]:
                     if "stack_price" in item:
-                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                        print(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
                     else:
-                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+                        print(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
             
             if vendor_changes["changed_items"]:
-                print("    Changed Items:")
+                print("    Changed Items:")    
                 for change in vendor_changes["changed_items"]:
+                    old_price = change['old'].get('price', change['old'].get('stack_price'))
+                    new_price = change['new'].get('price', change['new'].get('stack_price'))
                     print(f"      - Item ID: {change['item_id']}")
-                    print(f"        Old: {change['old']}")
-                    print(f"        New: {change['new']}")
+                    print(f"        Old: {change['old']['description']}, Amount: {change['old']['amount']}, Price: {old_price}")
+                    print(f"        New: {change['new']['description']}, Amount: {change['new']['amount']}, Price: {new_price}")
  
 def save_vendor_data_json(vendors, output_dir, input_file_name):
     try:
@@ -433,7 +435,6 @@ def save_inventory_json(inventory_summary, total_value, output_dir, input_file_n
         return None
     
 def save_vendor_changes(changes, output_dir, input_file_name):
-
     try:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
@@ -460,9 +461,9 @@ def save_vendor_changes(changes, output_dir, input_file_name):
                             f.write("    Items:\n")
                             for item in vendor["items"]:
                                 if "stack_price" in item:
-                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Stack Price: {item['stack_price']})\n")
+                                    f.write(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}\n")
                                 else:
-                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Price: {item['price']})\n")
+                                    f.write(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}\n")
                         else:
                             f.write("    Items: None\n")
                 
@@ -476,9 +477,9 @@ def save_vendor_changes(changes, output_dir, input_file_name):
                             f.write("    Items:\n")
                             for item in vendor["items"]:
                                 if "stack_price" in item:
-                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Stack Price: {item['stack_price']})\n")
+                                    f.write(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}\n")
                                 else:
-                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Price: {item['price']})\n")
+                                    f.write(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}\n")
                         else:
                             f.write("    Items: None\n")
                 
@@ -492,24 +493,26 @@ def save_vendor_changes(changes, output_dir, input_file_name):
                             f.write("    Added Items:\n")
                             for item in vendor_changes["added_items"]:
                                 if "stack_price" in item:
-                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Stack Price: {item['stack_price']})\n")
+                                    f.write(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}\n")
                                 else:
-                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Price: {item['price']})\n")
+                                    f.write(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}\n")
                         
                         if vendor_changes["removed_items"]:
                             f.write("    Removed Items:\n")
                             for item in vendor_changes["removed_items"]:
                                 if "stack_price" in item:
-                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Stack Price: {item['stack_price']})\n")
+                                    f.write(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}\n")
                                 else:
-                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Price: {item['price']})\n")
+                                    f.write(f"      - (ID: {item['id']}) {item['description']}, Amount: {item['amount']}, Price: {item['price']}\n")
                         
                         if vendor_changes["changed_items"]:
                             f.write("    Changed Items:\n")
                             for change in vendor_changes["changed_items"]:
+                                old_price = change['old'].get('price', change['old'].get('stack_price'))
+                                new_price = change['new'].get('price', change['new'].get('stack_price'))
                                 f.write(f"      - Item ID: {change['item_id']}\n")
-                                f.write(f"        Old: {change['old']}\n")
-                                f.write(f"        New: {change['new']}\n")
+                                f.write(f"        Old: {change['old']['description']}, Amount: {change['old']['amount']}, Price: {old_price}\n")
+                                f.write(f"        New: {change['new']['description']}, Amount: {change['new']['amount']}, Price: {new_price}\n")
 
         print(f"Changes saved to: {output_file}")
         return output_file
@@ -616,7 +619,7 @@ def compare_vendors(new_vendors, old_file_path):
       
 def main():
     input_folder_path = r"C:\Program Files (x86)\Ultima Online Outlands\ClassicUO\Data\Client\JournalLogs"
-    output_directory = os.path.join(r"C:\Users\xxxx\Documents", "Processed")
+    output_directory = os.path.join(r"C:\Users\dcorr\Documents", "Processed")
     
     if not os.path.exists(input_folder_path):
         print(f"Error: Input folder '{input_folder_path}' does not exist. Please check the path.")
