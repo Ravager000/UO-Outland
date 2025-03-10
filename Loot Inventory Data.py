@@ -22,15 +22,20 @@ def get_newest_outland_journal_file(folder_path):
         return None
     
 def process_Items_data(file_path):
-    Items = []
+    data = {
+    "name": None,
+    "items": []
+}
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
             for line in lines:
                 line = line.strip()
-                
-                # Process [Razor]: ID: lines
+                if "System: Welcome" in line:
+                    name = line.split("System: Welcome")[1].strip()
+                    data["name"] = name
+                    
                 if "[Razor]: ID:" in line:
                     item_data = line.split("[Razor]: ID:")[1].strip()
                     parts = item_data.split()
@@ -53,14 +58,12 @@ def process_Items_data(file_path):
                             "description": description,
                             "amount": amount
                         }
-                        Items.append(item)
+                        data["items"].append(item)
                 
-                # Process gold deposit lines
                 elif "System: You deposit" in line:
                     parts = line.split("System: You deposit")
                     if len(parts) > 1:
                         deposit_data = parts[1].strip()
-                        # Extract the number before "gold"
                         amount_str = deposit_data.split(" gold")[0].replace(",", "").strip()
                         if amount_str.isdigit():
                             amount = int(amount_str)
@@ -69,9 +72,9 @@ def process_Items_data(file_path):
                                 "description": "gold",
                                 "amount": amount
                             }
-                            Items.append(item)
+                            data["items"].append(item)
 
-        return Items
+        return data
     
     except FileNotFoundError:
         print(f"Error: The file '{file_path}' was not found.")
@@ -83,12 +86,12 @@ def process_Items_data(file_path):
         print(f"Error processing file '{file_path}': {e}")
         return []
 
-def merge_identical_items(items):
-    """
-    Merges items with identical descriptions by summing their amounts.
-    Keeps the first encountered ID for each unique description.
-    """
+def merge_identical_items(data):
+
     merged_items = {}
+    
+    # Extract items from the data dictionary
+    items = data["items"]
     
     for item in items:
         desc = item["description"]
@@ -101,7 +104,11 @@ def merge_identical_items(items):
                 "amount": item["amount"]
             }
     
-    return list(merged_items.values())
+    # Return a new dictionary with the original name and merged items
+    return {
+        "name": data["name"],
+        "items": list(merged_items.values())
+    }
 
 def save_Items_json(vendors, output_dir, input_file_name):
     try:
@@ -120,7 +127,8 @@ def save_Items_json(vendors, output_dir, input_file_name):
         print(f"Error saving JSON data: {e}")
         return None
     
-def display_inventory_data(items,merged_items):
+def display_inventory_data(items, merged_items,name):
+    print(f"Name: {name}")
     print("\n====================== Inventory Summary ======================")
     print(f"Found {len(items)} total items, merged into {len(merged_items)} unique items.\n")
     for item in merged_items:
@@ -128,7 +136,7 @@ def display_inventory_data(items,merged_items):
         
     print("\n===============================================================")
 
-def save_Items_data(items,merged_items, output_dir, input_file_name):
+def save_Items_data(items, merged_items, output_dir, input_file_name, name):
     try:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
@@ -138,6 +146,7 @@ def save_Items_data(items,merged_items, output_dir, input_file_name):
 
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(f"Processed Data from {input_file_name}\n")
+            f.write(f"Name: {name}\n")
             f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
             f.write("====================== Inventory Summary ======================\n")
             f.write(f"Found {len(items)} total items, merged into {len(merged_items)} unique items.\n\n")
@@ -146,7 +155,6 @@ def save_Items_data(items,merged_items, output_dir, input_file_name):
         
             f.write("\n===============================================================")
             
-    
         print(f"Data saved to: {output_file}")
         return output_file
     except PermissionError:
@@ -172,20 +180,26 @@ def main():
     print(f"Processing file: {newest_file}")
     base_name = os.path.splitext(os.path.basename(newest_file))[0]
     
-    items = process_Items_data(newest_file)
-    if not items:
+    # Get the full data structure
+    data = process_Items_data(newest_file)
+    if not data or not data["items"]:
         print("Processing failed or no items found. Check error messages above.")
         return
     
-    # Merge identical items
-    merged_items = merge_identical_items(items)
+    # Merge items using the full data structure
+    merged_data = merge_identical_items(data)
+    name = data["name"]
+    # Extract items for display and text saving
+    items = data["items"]  # Original unmerged items
+    merged_items = merged_data["items"]  # Merged items
     
-    # Print results
-    display_inventory_data(items,merged_items)
-    # Save JSON data
-    save_Items_json(merged_items, output_directory, base_name)
-    # Save texte file
-    save_Items_data(items,merged_items, output_directory, base_name)
+    display_inventory_data(items, merged_items,name)
+    
+    # Save full JSON data (unmerged)
+    save_Items_json(data, output_directory, base_name)
+    
+    # Save text file with merged items and name
+    save_Items_data(items, merged_items, output_directory, base_name, name)
 
 if __name__ == "__main__":
     main()
