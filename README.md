@@ -2,6 +2,29 @@
 ## ClassicUO Razor
 ### Collection of usefull script & tools
 
+Loot Inventory Data.py     **Output Sample**
+
+journal_Items.txt
+
+Processed Data from 2025_03_09_23_41_54_journal
+Date: 2025-03-10 03:25:06
+
+====================== Inventory Summary ======================
+Found 13 total items, merged into 10 unique items.
+
+(ID: 1139692141)  unidentified magic spellbook, Amount: 4
+(ID: 1140310936)  citrine , Amount: 4
+(ID: 1139881832)  sapphire , Amount: 2
+(ID: 1139694215)  tourmaline , Amount: 2
+(ID: 1139591302)  leather , Amount: 774
+(ID: 1140081213)  rosehide , Amount: 85
+(ID: 1140122189)  unidentified platemail gorget, Amount: 1
+(ID: 1140310937)  shadowhide skinning map (undeciphered), Amount: 1
+(ID: 1139694216)  plant chemicals, Amount: 1
+(ID: 9999999999)  gold, Amount: 8644
+
+===============================================================
+
 Vendor Data.py     **Output Sample**
 
 journal_processed.txt
