@@ -21,9 +21,14 @@ def get_newest_outland_journal_file(folder_path):
         print(f"Error accessing folder '{folder_path}': {e}")
         return None
 
-def get_latest_inventory_summary_file(folder_path):
-    try:# List files that contain base_name and end with .json
-        files = [f for f in os.listdir(folder_path) if "inventory_summary" in f and f.endswith(".json")]
+def get_latest_vendors_file(folder_path, filter_tag=None):
+    try:
+        # List files that contain "processed" and end with .json, optionally filtering by filter_tag
+        if filter_tag is None:
+            files = [f for f in os.listdir(folder_path) if "processed" in f and f.endswith(".json")]
+        else:
+            files = [f for f in os.listdir(folder_path) if "processed" in f and filter_tag in f and f.endswith(".json")]
+        
         if not files:
             print(f"No .txt files found in {folder_path}")
             return
@@ -196,7 +201,7 @@ def save_vendor_data(vendors, output_dir, input_file_name):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y-%m-%d-%H")
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H")
         output_file = os.path.join(output_dir, f"{input_file_name}_processed_{timestamp}.txt")
 
         with open(output_file, 'w', encoding='utf-8') as f:
@@ -210,11 +215,11 @@ def save_vendor_data(vendors, output_dir, input_file_name):
                 if vendor['items']:
                     for item in vendor['items']:
                         if "stack_price" in item:
-                            f.write(f"  - Item ID: {item['id']}, Description: {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}\n")
+                            f.write(f"  - Item (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}\n")
                         else:
-                            f.write(f"  - Item ID: {item['id']}, Description: {item['description']}, Amount: {item['amount']}, Price: {item['price']}\n")
+                            f.write(f"  - Item (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}\n")
                 else:
-                    f.write("  (No items listed)\n")
+                    f.write("  No items listed\n")
                 f.write("-" * 50 + "\n")
         
         print(f"Data saved to: {output_file}")
@@ -231,7 +236,7 @@ def save_inventory_data(inventory_summary, total_inventory_value, output_dir, in
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y-%m-%d-%H")   
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H")   
         output_file = os.path.join(output_dir, f"{input_file_name}_inventory_summary_{timestamp}.txt")
 
         with open(output_file, 'w', encoding='utf-8') as f:
@@ -240,7 +245,7 @@ def save_inventory_data(inventory_summary, total_inventory_value, output_dir, in
             f.write("====================== Inventory Summary ======================\n\n")
             for description, details in inventory_summary.items():
                 prices_str = ', '.join(str(p) for p in details['prices'])
-                f.write(f"- Item Description: {description}, Total Amount: {details['amount']}, Prices: [{prices_str}], Average Price: {details['avg_unit_price']:.1f}, Total Value: {details['total_value']}\n")
+                f.write(f"- Item {description}, Total Amount: {details['amount']}, Prices: [{prices_str}], Average Price: {details['avg_unit_price']:.1f}, Total Value: {details['total_value']}\n")
             
             f.write(f"\nOverall Total Value: {total_inventory_value}\n")
             f.write("\n===============================================================")
@@ -263,28 +268,99 @@ def display_vendor_data(vendors):
         if vendor['items']:
             for item in vendor['items']:
                 if "stack_price" in item:
-                    print(f"  - Item ID: {item['id']}, Description: {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                    print(f"  - Item (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
                 else:
-                    print(f"  - Item ID: {item['id']}, Description: {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+                    print(f"  - Item (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
         else:
-            print("  (No items listed)")
+            print("  No items listed")
         print("-" * 50)
    
    
 def display_inventory_data(inventory_summary, total_inventory_value):
     print("\n====================== Inventory Summary ======================\n")
     for description, details in inventory_summary.items():
-        print(f"- Item Description: {description}, Total Amount: {details['amount']}, Prices: {details['prices']}, Average Unit Price: {details['avg_unit_price']:.1f}, Total Value: {details['total_value']}")
+        print(f"- Item {description}, Total Amount: {details['amount']}, Prices: {details['prices']}, Average Unit Price: {details['avg_unit_price']:.1f}, Total Value: {details['total_value']}")
 
     print(f"\nOverall Total Value: {total_inventory_value}")
     print("\n===============================================================")
+        
+def print_vendor_changes(changes):
+    print("\n=== Vendor Comparison Results ===")
     
+    # Check if there are any changes to report
+    if not (changes["added_vendors"] or changes["removed_vendors"] or changes["item_changes"]):
+        print("No changes detected.")
+        return
+    
+    # Added Vendors
+    if changes["added_vendors"]:
+        print("\nAdded Vendors:")
+        for vendor in changes["added_vendors"]:
+            print(f"  - {vendor['name']} (ID: {vendor['id']})")
+            print(f"    Location: {vendor['location']}")
+            if vendor["items"]:
+                print("    Items:")
+                for item in vendor["items"]:
+                    if "stack_price" in item:
+                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                    else:
+                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+            else:
+                print("    Items: None")
+    
+    # Removed Vendors
+    if changes["removed_vendors"]:
+        print("\nRemoved Vendors:")
+        for vendor in changes["removed_vendors"]:
+            print(f"  - {vendor['name']} (ID: {vendor['id']})")
+            print(f"    Location: {vendor['location']}")
+            if vendor["items"]:
+                print("    Items:")
+                for item in vendor["items"]:
+                    if "stack_price" in item:
+                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                    else:
+                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+            else:
+                print("    Items: None")
+    
+    # Item Changes
+    if changes["item_changes"]:
+        print("\nItem Changes:")
+        for vendor_id, vendor_changes in changes["item_changes"].items():
+            # Find the vendor name from either added or remaining vendors (assuming new_vendors is available)
+            # For simplicity, we'll just use the ID here; you could pass new_vendors to look up names
+            print(f"\n  Vendor ID: {vendor_id}")
+            
+            if vendor_changes["added_items"]:
+                print("    Added Items:")
+                for item in vendor_changes["added_items"]:
+                    if "stack_price" in item:
+                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                    else:
+                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+            
+            if vendor_changes["removed_items"]:
+                print("    Removed Items:")
+                for item in vendor_changes["removed_items"]:
+                    if "stack_price" in item:
+                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Stack Price: {item['stack_price']}")
+                    else:
+                        print(f"      - (ID: {item['id']}), {item['description']}, Amount: {item['amount']}, Price: {item['price']}")
+            
+            if vendor_changes["changed_items"]:
+                print("    Changed Items:")
+                for change in vendor_changes["changed_items"]:
+                    print(f"      - Item ID: {change['item_id']}")
+                    print(f"        Old: {change['old']}")
+                    print(f"        New: {change['new']}")
+ 
 def save_vendor_data_json(vendors, output_dir, input_file_name):
     try:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y-%m-%d-%H") 
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H") 
         output_file = os.path.join(output_dir, f"{input_file_name}_processed_{timestamp}.json")
 
         with open(output_file, 'w', encoding='utf-8') as json_file:
@@ -344,7 +420,7 @@ def save_inventory_json(inventory_summary, total_value, output_dir, input_file_n
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        timestamp = datetime.now().strftime("%Y-%m-%d-%H")
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H")
         output_file = os.path.join(output_dir, f"{input_file_name}_inventory_summary_{timestamp}.json")
         
         with open(output_file, 'w', encoding='utf-8') as json_file:
@@ -356,6 +432,188 @@ def save_inventory_json(inventory_summary, total_value, output_dir, input_file_n
         print(f"Error saving inventory JSON: {e}")
         return None
     
+def save_vendor_changes(changes, output_dir, input_file_name):
+
+    try:
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H")
+        output_file = os.path.join(output_dir, f"{input_file_name}_changes_{timestamp}.txt")
+
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(f"Old Vendor Data from {input_file_name}\n")
+            f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            f.write("=== Vendor Comparison Results ===\n")
+            
+            # Check if there are any changes to report
+            if not (changes["added_vendors"] or changes["removed_vendors"] or changes["item_changes"]):
+                f.write("No changes detected.\n")
+            else:
+                # Added Vendors
+                if changes["added_vendors"]:
+                    f.write("\nAdded Vendors:\n")
+                    for vendor in changes["added_vendors"]:
+                        f.write(f"  - {vendor['name']} (ID: {vendor['id']})\n")
+                        f.write(f"    Location: {vendor['location']}\n")
+                        if vendor["items"]:
+                            f.write("    Items:\n")
+                            for item in vendor["items"]:
+                                if "stack_price" in item:
+                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Stack Price: {item['stack_price']})\n")
+                                else:
+                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Price: {item['price']})\n")
+                        else:
+                            f.write("    Items: None\n")
+                
+                # Removed Vendors
+                if changes["removed_vendors"]:
+                    f.write("\nRemoved Vendors:\n")
+                    for vendor in changes["removed_vendors"]:
+                        f.write(f"  - {vendor['name']} (ID: {vendor['id']})\n")
+                        f.write(f"    Location: {vendor['location']}\n")
+                        if vendor["items"]:
+                            f.write("    Items:\n")
+                            for item in vendor["items"]:
+                                if "stack_price" in item:
+                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Stack Price: {item['stack_price']})\n")
+                                else:
+                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Price: {item['price']})\n")
+                        else:
+                            f.write("    Items: None\n")
+                
+                # Item Changes
+                if changes["item_changes"]:
+                    f.write("\nItem Changes:\n")
+                    for vendor_id, vendor_changes in changes["item_changes"].items():
+                        f.write(f"\n  Vendor ID: {vendor_id}\n")
+                        
+                        if vendor_changes["added_items"]:
+                            f.write("    Added Items:\n")
+                            for item in vendor_changes["added_items"]:
+                                if "stack_price" in item:
+                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Stack Price: {item['stack_price']})\n")
+                                else:
+                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Price: {item['price']})\n")
+                        
+                        if vendor_changes["removed_items"]:
+                            f.write("    Removed Items:\n")
+                            for item in vendor_changes["removed_items"]:
+                                if "stack_price" in item:
+                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Stack Price: {item['stack_price']})\n")
+                                else:
+                                    f.write(f"      - {item['description']} (ID: {item['id']}, Amount: {item['amount']}, Price: {item['price']})\n")
+                        
+                        if vendor_changes["changed_items"]:
+                            f.write("    Changed Items:\n")
+                            for change in vendor_changes["changed_items"]:
+                                f.write(f"      - Item ID: {change['item_id']}\n")
+                                f.write(f"        Old: {change['old']}\n")
+                                f.write(f"        New: {change['new']}\n")
+
+        print(f"Changes saved to: {output_file}")
+        return output_file
+    
+    except PermissionError:
+        print(f"Error: Permission denied to write to '{output_dir}'.")
+        return None
+    except Exception as e:
+        print(f"Error saving changes to '{output_dir}': {e}")
+        return None
+   
+def save_vendor_changes_json(changes, output_dir, input_file_name):
+    try:
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H") 
+        output_file = os.path.join(output_dir, f"{input_file_name}_changes_{timestamp}.json")
+
+        with open(output_file, 'w', encoding='utf-8') as json_file:
+            json.dump(changes, json_file, indent=4, ensure_ascii=False)
+
+        print(f"JSON Data saved to: {output_file}")
+        return output_file
+    except Exception as e:
+        print(f"Error saving JSON data: {e}")
+        return None
+    
+def compare_vendors(new_vendors, old_file_path):
+    # Load old vendors from the JSON file
+    try:
+        with open(old_file_path, 'r', encoding='utf-8') as f:
+            old_vendors = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: Could not find file '{old_file_path}'. Assuming no previous data.")
+        old_vendors = []
+    except json.JSONDecodeError:
+        print(f"Error: Invalid JSON in '{old_file_path}'. Assuming no previous data.")
+        old_vendors = []
+    except Exception as e:
+        print(f"Error loading '{old_file_path}': {e}")
+        old_vendors = []
+
+    # Convert lists to dictionaries for easier lookup by vendor ID
+    new_vendors_dict = {v["id"]: v for v in new_vendors}
+    old_vendors_dict = {v["id"]: v for v in old_vendors}
+
+    # Results dictionary
+    comparison = {
+        "added_vendors": [],
+        "removed_vendors": [],
+        "item_changes": {}  # Vendor ID -> list of item changes
+    }
+
+    # Check for added vendors (in new but not old)
+    for vendor_id in new_vendors_dict:
+        if vendor_id not in old_vendors_dict:
+            comparison["added_vendors"].append(new_vendors_dict[vendor_id])
+
+    # Check for removed vendors (in old but not new)
+    for vendor_id in old_vendors_dict:
+        if vendor_id not in new_vendors_dict:
+            comparison["removed_vendors"].append(old_vendors_dict[vendor_id])
+
+    # Compare items for vendors present in both
+    for vendor_id in new_vendors_dict:
+        if vendor_id in old_vendors_dict:
+            new_items = {item["id"]: item for item in new_vendors_dict[vendor_id]["items"]}
+            old_items = {item["id"]: item for item in old_vendors_dict[vendor_id]["items"]}
+
+            vendor_changes = {
+                "added_items": [],
+                "removed_items": [],
+                "changed_items": []
+            }
+
+            # Check for added items
+            for item_id in new_items:
+                if item_id not in old_items:
+                    vendor_changes["added_items"].append(new_items[item_id])
+
+            # Check for removed items
+            for item_id in old_items:
+                if item_id not in new_items:
+                    vendor_changes["removed_items"].append(old_items[item_id])
+
+            # Check for changed items
+            for item_id in new_items:
+                if item_id in old_items:
+                    new_item = new_items[item_id]
+                    old_item = old_items[item_id]
+                    if new_item != old_item:  # Compare entire item dict
+                        vendor_changes["changed_items"].append({
+                            "item_id": item_id,
+                            "old": old_item,
+                            "new": new_item
+                        })
+
+            # Only add to results if there are changes
+            if vendor_changes["added_items"] or vendor_changes["removed_items"] or vendor_changes["changed_items"]:
+                comparison["item_changes"][vendor_id] = vendor_changes
+
+    return comparison    
+      
 def main():
     input_folder_path = r"C:\Program Files (x86)\Ultima Online Outlands\ClassicUO\Data\Client\JournalLogs"
     output_directory = os.path.join(r"C:\Users\xxxx\Documents", "Processed")
@@ -395,6 +653,15 @@ def main():
     # Optional: Comment out the following lines to skip displaying the data
     display_inventory_data(inventory_summary, total_inventory_value)
     
+    latest_file = get_latest_vendors_file(output_directory, filter_tag)
+    if not latest_file:
+        print("No previous file to compare with.")
+        return
+    
+    changes = compare_vendors(vendors, latest_file)
+    # Optional: Comment out the following lines to skip displaying the data
+    print_vendor_changes(changes)
+           
     saved_file = save_vendor_data(vendors, output_directory, base_name)
     if not saved_file:
         print("Failed to save the data. Check error messages above.")
@@ -415,5 +682,16 @@ def main():
         print("Failed to save the inventory summary. Check error messages above.")
         return
 
+    changes_file = save_vendor_changes(changes, output_directory, base_name)
+    if not changes_file:
+        print("Failed to save the changes. Check error messages above.")
+        return
+    
+    change_json = save_vendor_changes_json(changes, output_directory, base_name)
+    if not change_json:
+        print("Failed to save the JSON changes. Check error messages above.")
+        return
+        
 if __name__ == "__main__":
     main()
+    
