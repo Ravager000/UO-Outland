@@ -11,7 +11,9 @@ Name: Jane Ravage!
 Date: 2025-03-11 07:53:07
 
 First timestamp: 03/11/2025 05:12
+
 ====================== Inventory Summary ======================
+
 Found 39 total items, merged into 17 unique items.
 
 (ID: 1221764360)  avarite ingot , Amount: 8
@@ -33,7 +35,9 @@ Found 39 total items, merged into 17 unique items.
 (ID: 1222198595)  trap rune (Trap damage increased by 15.0%) [double click to place], Amount: 1
 
 Time played: 1 hours and 36 minutes
+
 ===============================================================
+
 Last timestamp: 03/11/2025 06:48
 
 Vendor Data.py     **Output Sample**

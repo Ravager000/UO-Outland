@@ -127,16 +127,18 @@ def save_Items_json(vendors, output_dir, input_file_name):
         print(f"Error saving JSON data: {e}")
         return None
     
-def display_inventory_data(items, merged_items,name):
+def display_inventory_data(items, merged_items,name, time):
     print(f"Name: {name}")
-    print("\n====================== Inventory Summary ======================")
+    print(f"First timestamp: {time['first_time']}\n")
+    print("====================== Inventory Summary ======================\n")
     print(f"Found {len(items)} total items, merged into {len(merged_items)} unique items.\n")
     for item in merged_items:
         print(f"(ID: {item['id']})  {item['description']}, Amount: {item['amount']}")
-        
-    print("\n===============================================================")
-
-def save_Items_data(items, merged_items, output_dir, input_file_name, name):
+    print(f"\nTime played: {time['time_played']}\n")   
+    print("===============================================================\n")
+    print(f"Last timestamp: {time['last_time']}\n")
+    
+def save_Items_data(items, merged_items, output_dir, input_file_name, name, time):
     try:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
@@ -148,12 +150,14 @@ def save_Items_data(items, merged_items, output_dir, input_file_name, name):
             f.write(f"Processed Data from {input_file_name}\n")
             f.write(f"Name: {name}\n")
             f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            f.write(f"First timestamp: {time['first_time']}\n")
             f.write("====================== Inventory Summary ======================\n")
             f.write(f"Found {len(items)} total items, merged into {len(merged_items)} unique items.\n\n")
             for item in merged_items:
                 f.write(f"(ID: {item['id']})  {item['description']}, Amount: {item['amount']}\n")
-        
-            f.write("\n===============================================================")
+            f.write(f"\nTime played: {time['time_played']}\n")
+            f.write("===============================================================\n")
+            f.write(f"Last timestamp: {time['last_time']}\n")
             
         print(f"Data saved to: {output_file}")
         return output_file
@@ -163,6 +167,52 @@ def save_Items_data(items, merged_items, output_dir, input_file_name, name):
     except Exception as e:
         print(f"Error saving data to '{output_dir}': {e}")
         return None      
+
+def extract_time_played(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        document = file.read()
+    
+    # Split document into lines
+    lines = document.strip().split('\n')
+    
+    # Get first timestamp from first line
+    first_line = lines[0]
+    if not (first_line.startswith('[') and ']' in first_line):
+        return "First line doesn't contain a valid timestamp"
+    
+    try:
+        first_timestamp_str = first_line.split('[')[1].split(']')[0]
+        first_time = datetime.strptime(first_timestamp_str, '%m/%d/%Y %H:%M')
+    except (ValueError, IndexError):
+        return "Invalid timestamp format in first line"
+    
+    # Get last timestamp from last line
+    last_line = lines[-1]
+    if not (last_line.startswith('[') and ']' in last_line):
+        return "Last line doesn't contain a valid timestamp"
+    
+    try:
+        last_timestamp_str = last_line.split('[')[1].split(']')[0]
+        last_time = datetime.strptime(last_timestamp_str, '%m/%d/%Y %H:%M')
+    except (ValueError, IndexError):
+        return "Invalid timestamp format in last line"
+    
+    # Calculate time difference
+    time_diff = last_time - first_time
+    
+    # Convert to hours, minutes
+    total_minutes = int(time_diff.total_seconds() / 60)
+    hours = total_minutes // 60
+    minutes = total_minutes % 60
+    
+    # Format the result
+    result = {
+        'first_time': first_time.strftime('%m/%d/%Y %H:%M'),
+        'last_time': last_time.strftime('%m/%d/%Y %H:%M'),
+        'time_played': f"{hours} hours and {minutes} minutes"
+    }
+    
+    return result
 
 def main():
     input_folder_path = r"C:\Program Files (x86)\Ultima Online Outlands\ClassicUO\Data\Client\JournalLogs"
@@ -193,13 +243,15 @@ def main():
     items = data["items"]  # Original unmerged items
     merged_items = merged_data["items"]  # Merged items
     
-    display_inventory_data(items, merged_items,name)
+    time = extract_time_played(newest_file)
+    
+    display_inventory_data(items, merged_items,name, time)
     
     # Save full JSON data (unmerged)
     save_Items_json(data, output_directory, base_name)
     
     # Save text file with merged items and name
-    save_Items_data(items, merged_items, output_directory, base_name, name)
+    save_Items_data(items, merged_items, output_directory, base_name, name, time)
 
 if __name__ == "__main__":
     main()
