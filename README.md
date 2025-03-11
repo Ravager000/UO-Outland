@@ -6,34 +6,35 @@ Loot Inventory Data.py     **Output Sample**
 
 journal_Items.txt
 
-Processed Data from 2025_03_09_23_41_54_journal
-Date: 2025-03-10 03:25:06
+Processed Data from 2025_03_11_05_12_51_journal
+Name: Jane Ravage!
+Date: 2025-03-11 07:53:07
 
+First timestamp: 03/11/2025 05:12
 ====================== Inventory Summary ======================
+Found 39 total items, merged into 17 unique items.
 
-Found 13 total items, merged into 10 unique items.
+(ID: 1221764360)  avarite ingot , Amount: 8
+(ID: 1221763865)  copper ingot , Amount: 196
+(ID: 1221764089)  dull copper ingot , Amount: 198
+(ID: 1221764685)  iron ingot , Amount: 7858
+(ID: 1221765095)  bronze ingot , Amount: 116
+(ID: 1222306631)  shadow iron ingot , Amount: 106
+(ID: 1222307314)  verite ingot , Amount: 98
+(ID: 1222307895)  gold ingot , Amount: 110
+(ID: 1222309512)  valorite ingot , Amount: 24
+(ID: 1223415076)  agapite ingot , Amount: 20
+(ID: 9999999999)  gold, Amount: 637
+(ID: 1223844682)  sapphire , Amount: 17
+(ID: 1222198556)  star sapphire , Amount: 17
+(ID: 1222198558)  tourmaline , Amount: 4
+(ID: 1222198562)  ham feast (delectable), Amount: 1
+(ID: 1222198563)  fish feast (delectable), Amount: 1
+(ID: 1222198595)  trap rune (Trap damage increased by 15.0%) [double click to place], Amount: 1
 
-(ID: 1139692141)  unidentified magic spellbook, Amount: 4
-
-(ID: 1140310936)  citrine , Amount: 4
-
-(ID: 1139881832)  sapphire , Amount: 2
-
-(ID: 1139694215)  tourmaline , Amount: 2
-
-(ID: 1139591302)  leather , Amount: 774
-
-(ID: 1140081213)  rosehide , Amount: 85
-
-(ID: 1140122189)  unidentified platemail gorget, Amount: 1
-
-(ID: 1140310937)  shadowhide skinning map (undeciphered), Amount: 1
-
-(ID: 1139694216)  plant chemicals, Amount: 1
-
-(ID: 9999999999)  gold, Amount: 8644
-
+Time played: 1 hours and 36 minutes
 ===============================================================
+Last timestamp: 03/11/2025 06:48
 
 Vendor Data.py     **Output Sample**
 
