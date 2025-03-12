@@ -62,9 +62,13 @@ def process_vendor_data(file_path):
                     in_scan_section = True
                     continue
 
-                # Fin de la section de scan
                 if "[Razor]: …OutlandMall End" in line:
-                    break
+                    in_scan_section = False
+                    #break  # Stop processing completely
+
+                # If not in scan section, ignore the line
+                    if not in_scan_section:
+                        continue
 
                 if in_scan_section:
                     # Détection du début d'un vendeur
@@ -96,8 +100,13 @@ def process_vendor_data(file_path):
 
                     # Extraction des articles
                     if "[Razor]: …item" in line and current_vendor:
+                        if "Not for sale" in line:
+                            continue  # Ignore the line if it contains 'Not for sale'
                         # Filtre les tags inutiles
                         line = line.replace("(used to increase a player's skill cap for a skill by 1)", "")
+                        line = line.replace("[double click to place]", "")
+                        line = line.replace("(0 items, 0 stones)", "")
+                        line = line.replace("(double-click to activate)", "")
                         # Vérifier si la ligne contient "|| Stack Price:" ou "|| Price:"
                         if " Stack Price:" in line:
                             parts = line.split(" Stack Price:")
@@ -132,7 +141,13 @@ def process_vendor_data(file_path):
                                 end = desc_amount.index(")")
                                 extra_info = desc_amount[start:end+1].strip()
                                 desc_amount = desc_amount[:start].strip() + desc_amount[end+1:].strip()
-                            
+                                
+                            if "[" in desc_amount and "]" in desc_amount:
+                                start = desc_amount.index("[")
+                                end = desc_amount.index("]")
+                                extra_info = desc_amount[start:end+1].strip()
+                                desc_amount = desc_amount[:start].strip() + desc_amount[end+1:].strip()
+                                
                             if " : " in desc_amount:
                                 description, amount = desc_amount.split(" : ", 1)
                                 description = description.strip()
@@ -163,6 +178,12 @@ def process_vendor_data(file_path):
                             if "(" in desc_amount and ")" in desc_amount:
                                 start = desc_amount.index("(")
                                 end = desc_amount.index(")")
+                                extra_info = desc_amount[start:end+1].strip()
+                                desc_amount = desc_amount[:start].strip() + desc_amount[end+1:].strip()
+                                
+                            if "[" in desc_amount and "]" in desc_amount:
+                                start = desc_amount.index("[")
+                                end = desc_amount.index("]")
                                 extra_info = desc_amount[start:end+1].strip()
                                 desc_amount = desc_amount[:start].strip() + desc_amount[end+1:].strip()
                             
@@ -387,7 +408,7 @@ def summarize_inventory(vendors):
             else:
                 price_total = int(item.get("price", "0").replace(",", ""))
                 amount_temp = int(item.get("amount", "1").replace(",", ""))
-                price = int(price_total / amount_temp) #if amount_temp != 0 else price_total
+                price = int(price_total / amount_temp) if amount_temp != 0 else price_total
 
             amount = int(item.get("amount", "1").replace(",", ""))
             item_total_value = price * amount
@@ -649,51 +670,51 @@ def main():
         base_name += f"_{filter_tag}"
      
     inventory_summary, total_inventory_value = summarize_inventory(vendors)
-    if inventory_summary is None:
-        print("Error: Failed to summarize inventory.")
-        return 
+    #if inventory_summary is None:
+    #    print("Error: Failed to summarize inventory.")
+    #    return 
         
     # Optional: Comment out the following lines to skip displaying the data
     display_inventory_data(inventory_summary, total_inventory_value)
     
     latest_file = get_latest_vendors_file(output_directory, filter_tag)
-    if not latest_file:
-        print("No previous file to compare with.")
-        return
+    #if not latest_file:
+    #    print("No previous file to compare with.")
+    #    return
     
     changes = compare_vendors(vendors, latest_file)
     # Optional: Comment out the following lines to skip displaying the data
     print_vendor_changes(changes)
            
     saved_file = save_vendor_data(vendors, output_directory, base_name)
-    if not saved_file:
-        print("Failed to save the data. Check error messages above.")
-        return
+    #if not saved_file:
+    #    print("Failed to save the data. Check error messages above.")
+    #    return
     
     json_file = save_vendor_data_json(vendors, output_directory, base_name)
-    if not json_file:
-        print("Failed to save the JSON data. Check error messages above.")
-        return
+    #if not json_file:
+    #    print("Failed to save the JSON data. Check error messages above.")
+    #    return
     
     inventory_json = save_inventory_json(inventory_summary, total_inventory_value, output_directory, base_name)
-    if not inventory_json:
-        print("Failed to save the inventory summary. Check error messages above.")
-        return
+    #if not inventory_json:
+    #    print("Failed to save the inventory summary. Check error messages above.")
+    #    return
     
     inventory_data = save_inventory_data(inventory_summary, total_inventory_value, output_directory, base_name)
-    if not inventory_data:
-        print("Failed to save the inventory summary. Check error messages above.")
-        return
+    #if not inventory_data:
+    #    print("Failed to save the inventory summary. Check error messages above.")
+    #    return
 
     changes_file = save_vendor_changes(changes, output_directory, base_name)
-    if not changes_file:
-        print("Failed to save the changes. Check error messages above.")
-        return
+    #if not changes_file:
+    #    print("Failed to save the changes. Check error messages above.")
+    #    return
     
     change_json = save_vendor_changes_json(changes, output_directory, base_name)
-    if not change_json:
-        print("Failed to save the JSON changes. Check error messages above.")
-        return
+    #if not change_json:
+    #    print("Failed to save the JSON changes. Check error messages above.")
+    #    return
         
 if __name__ == "__main__":
     main()
