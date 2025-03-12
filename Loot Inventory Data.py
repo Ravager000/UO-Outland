@@ -32,6 +32,11 @@ def process_Items_data(file_path):
 
             for line in lines:
                 line = line.strip()
+                
+                line = line.replace("(used to increase a player's skill cap for a skill by 1)", "")
+                line = line.replace("[double click to place]", "")
+                line = line.replace("(0 items, 0 stones)", "")
+                line = line.replace("(double-click to activate)", "")
                 if "System: Welcome" in line:
                     name = line.split("System: Welcome")[1].strip()
                     data["name"] = name
