@@ -103,6 +103,7 @@ def process_vendor_data(file_path):
                         if "Not for sale" in line:
                             continue  # Ignore the line if it contains 'Not for sale'
                         # Filtre les tags inutiles
+                        line = line.replace("(used to increase a player's total skill cap by 1)", "")
                         line = line.replace("(used to increase a player's skill cap for a skill by 1)", "")
                         line = line.replace("[double click to place]", "")
                         line = line.replace("(0 items, 0 stones)", "")
