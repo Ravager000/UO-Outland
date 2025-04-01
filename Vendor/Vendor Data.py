@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 import json
-
+# TODO fix 'stacked potion keg:'
 def get_newest_outland_journal_file(folder_path):
     try:
         text_files = [f for f in os.listdir(folder_path) if f.endswith('.txt')]

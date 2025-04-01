@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import json
+#TODO: Index any pouch with item inside by ignoring empty one 
 
 def get_newest_outland_journal_file(folder_path):
     try:
