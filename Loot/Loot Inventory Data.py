@@ -24,9 +24,9 @@ def get_newest_outland_journal_file(folder_path):
     
 def process_Items_data(file_path):
     data = {
-    "name": None,
-    "items": []
-}
+        "name": None,
+        "items": []
+    }
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
@@ -101,7 +101,7 @@ def merge_identical_items(data):
     items = data["items"]
     
     for item in items:
-        desc = item["description"]
+        desc = item["description"].strip()
         if desc in merged_items:
             merged_items[desc]["amount"] += item["amount"]
         else:
@@ -110,11 +110,12 @@ def merge_identical_items(data):
                 "description": desc,
                 "amount": item["amount"]
             }
-    
+    # Convert to list and sort alphabetically by description
+    sorted_items = sorted(merged_items.values(), key=lambda x: x["description"].lower())
     # Return a new dictionary with the original name and merged items
     return {
         "name": data["name"],
-        "items": list(merged_items.values())
+        "items": sorted_items
     }
 
 def save_Items_json(vendors, output_dir, input_file_name):
@@ -134,11 +135,52 @@ def save_Items_json(vendors, output_dir, input_file_name):
         print(f"Error saving JSON data: {e}")
         return None
     
+def merge_identical_items_unid(data):
+    merged_items = {}
+    unidentified_total = 0
+    unidentified_ids = set()  # To keep track of unique IDs for unidentified items
+    
+    # Extract items from the data dictionary
+    items = data["items"]
+    
+    for item in items:
+        desc = item["description"].strip()
+        # Check if "unidentified" is in the description (case-insensitive)
+        if "unidentified" in desc.lower():
+            unidentified_total += item["amount"]
+            unidentified_ids.add(item["id"])
+        else:
+            if desc in merged_items:
+                merged_items[desc]["amount"] += item["amount"]
+            else:
+                merged_items[desc] = {
+                    "id": item["id"],
+                    "description": desc,
+                    "amount": item["amount"]
+                }
+    
+    # Add the combined unidentified items if there are any
+    if unidentified_total > 0:
+        # Use the first ID from unidentified items or a generic one
+        unidentified_id = min(unidentified_ids) if unidentified_ids else "UNID"
+        merged_items["Unidentified Items"] = {
+            "id": unidentified_id,
+            "description": "Unidentified Items",
+            "amount": unidentified_total
+        }
+    # Convert to list and sort alphabetically by description
+    sorted_items = sorted(merged_items.values(), key=lambda x: x["description"].lower())
+    # Return a new dictionary with the original name and merged items
+    return {
+        "name": data["name"],
+        "items": sorted_items
+    }
+        
 def display_inventory_data(items, merged_items,name, time):
     print(f"Name: {name}")
     print(f"First timestamp: {time['first_time']}\n")
     print("====================== Inventory Summary ======================\n")
-    print(f"Found {len(items)} total items, merged into {len(merged_items)} unique items.\n")
+    print(f"Found {len(items)} total items.\n")
     for item in merged_items:
         print(f"(ID: {item['id']})  {item['description']}, Amount: {item['amount']}")
     print(f"\nTime played: {time['time_played']}\n")   
@@ -252,7 +294,10 @@ def main():
     
     time = extract_time_played(newest_file)
     
-    display_inventory_data(items, merged_items,name, time)
+    merged_data_simple = merge_identical_items_unid(data)
+    merged_items_simple = merged_data_simple["items"]  # Merged items
+    
+    display_inventory_data(items, merged_items_simple,name, time)
     
     # Save full JSON data (unmerged)
     save_Items_json(data, output_directory, base_name)
