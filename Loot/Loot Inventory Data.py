@@ -39,6 +39,7 @@ def process_Items_data(file_path):
                 line = line.replace("[double click to place]", "")
                 line = line.replace("(0 items, 0 stones)", "")
                 line = line.replace("(double-click to activate)", "")
+                line = line.replace("(double-click to research)", "")
                 if "System: Welcome" in line:
                     name = line.split("System: Welcome")[1].strip()
                     data["name"] = name

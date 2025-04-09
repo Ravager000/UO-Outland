@@ -108,6 +108,7 @@ def process_vendor_data(file_path):
                         line = line.replace("[double click to place]", "")
                         line = line.replace("(0 items, 0 stones)", "")
                         line = line.replace("(double-click to activate)", "")
+                        line = line.replace("(double-click to research)", "")
                         # Vérifier si la ligne contient "|| Stack Price:" ou "|| Price:"
                         if " Stack Price:" in line:
                             parts = line.split(" Stack Price:")
