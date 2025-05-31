@@ -1,0 +1,53 @@
+
+# Drop off into a bag by Jaseowns
+# UO Outlands
+if not varexist golddropoff or not find golddropoff ground -1 -1 10
+    overhead "Where should items go?"
+    @setvar! golddropoff
+endif
+
+@clearignore 
+while findtype "gold coin" backpack as jaseowns_Item    
+    if not find golddropoff ground -1 -1 2
+    overhead "No Bag close?"
+    break
+    endif
+    lift jaseowns_Item 60000
+    drop golddropoff -1 -1 -1
+    wait 650
+    @ignore jaseowns_Item
+endwhile
+@clearignore 
+
+#
+# Drop off into a bag by Jaseowns
+#   or ground
+
+
+if not varexist golddropoff or not find golddropoff ground -1 -1 10
+    overhead "Where should items go?"
+    @setvar! golddropoff
+endif
+
+if cooldown 'PVP'
+if findtype 'gold coin' backpack as Coin
+    lift Coin 5000
+    if findtype 'gold coin' ground -1 -1 2 as GroundCoin
+       drop 'GroundCoin' -1 -1 1 
+       endif
+       droprelloc 0 0
+ endif
+elseif varexist golddropoff and find golddropoff ground -1 -1 2
+    if findtype "gold coin" backpack as jaseowns_Item 
+    lift jaseowns_Item 60000
+    drop golddropoff -1 -1 -1
+else 
+say "[Oops"
+if findtype 'gold coin' backpack as Coin
+    lift Coin 500
+    if findtype 'gold coin' ground -1 -1 2 as GroundCoin
+       drop 'GroundCoin' -1 -1 1 
+       endif
+endif
+droprelloc 0 0
+clearall 
