@@ -20,8 +20,9 @@ if not position 63 1570
     stop
 endif
 
+# This is where loot goes that does not get sucked up into shelfs
 if not varexist lootdropoff or not find lootdropoff ground -1 -1 2
-    overhead "Where should items go?"
+sysmsg "Where should items go that do not fit into a recycler or shelf?"
     @setvar! lootdropoff
 endif
 if not varexist jootbag or not find jootbag self 38
@@ -38,11 +39,13 @@ if not varexist jootbag or not find jootbag self 38
     endif
 endif
 
-//if not findlayer self righthand and varexist jase_righthand and jase_righthand != 0 and find jase_righthand self
-    // handle crooky 
-//    dclick jase_righthand
-//    wait globalTimeout
-//endif
+// OPEN untrapped pouches
+while findtype "pouch" backpack 0 as item
+    overhead "Open Untrapped Pouches" 89
+    dclick item
+    wait globalTimeout
+    @ignore item
+endwhile
 
 #if find myHouseSign ground -1 -1 20
 #    dclick myHouseSign
@@ -146,7 +149,7 @@ if Itemindexer = 1 and find jootbag backpack as container
                 endwhile
 endif
 
-if findtype "storage shelf" ground -1 -1 2 as shelf
+if findtype "storage shelf|gothic storage shelf|stump storage shelf" ground -1 -1 2 as shelf
     menu shelf 0
     wft 1000
     wait 100
@@ -182,26 +185,18 @@ endwhile
 @clearignore 
 
 if findtype "bank deposit safe" ground -1 -1 2 as safe
-     menu safe 0
-    #while findtype "gold coin" backpack as gold
-#        lift gold 60000
-#        drop safe -1 -1 -1
-        wait globalTimeout
-#    endwhile
-#    while findtype 'doubloon' backpack 2125 as joubloons
-#        lift joubloons 60000
-#        drop safe -1 -1 -1
-#        wait globalTimeout
-#    endwhile
+    menu safe 0
+    wait globalTimeout
 endif
 
 if findtype "resource container" ground -1 -1 2 as resource
     menu resource 0
     wft 1000
-    wait 200
+    wait 100
     target jootbag
     wait 200
 endif    
+
 if findtype "ornate elven chest|magic item recycler" ground -1 -1 2 as recycler
     menu recycler 1
     wait 200
@@ -246,7 +241,7 @@ while findtype 31169|3568|3570|3571|3572|3573|3713|3719|3721|3740|3742|3762|3763
     endif
 endwhile
 
-if findtype "storage shelf" ground -1 -1 2 as shelf
+if findtype "storage shelf|gothic storage shelf|stump storage shelf" ground -1 -1 2 as shelf
     menu shelf 1
     wait 200
 endif
@@ -255,6 +250,37 @@ endif
 ## This script works together with LiftyLoot: https://outlands.uorazorscripts.com/script/aa177d50-6934-465f-873c-f7f619d96f1e
 ## Also is already inside Organizer Control Shift O: https://outlands.uorazorscripts.com/script/11fd0082-1e79-4aa8-8015-b62fac929481
 @clearignore 
+
+
+#if not varexist jootbag or not find jootbag backpack
+#    if counttype "bag" backpack = 1 and findtype "bag" backpack as lootbag
+#        overhead "jootbag: Automatically setting to bag"
+#        sysmsg "jootbag: Automatically setting to bag"
+#        @setvar! jootbag lootbag
+#    else
+#        overhead "jootbag: Select your personal loot bag - where items go from your shelf"
+#        sysmsg "jootbag: Select your personal loot bag - where items go from your shelf"
+#        @setvar! jootbag 
+#    endif    
+#endif
+#
+#hotkey "Set Grab Item Hotbag"
+#wft 500
+#target backpack
+#
+
+clearsysmsg 
+
+if findtype "reagent satchel" self as jatchel
+    overhead "Organize Satchel" 88
+    menu jatchel 0
+endif
+
+if findtype 31262 self as jpotsatchel
+    overhead "Organize Potion Satchel" 88
+    menu jpotsatchel 0
+endif
+
 ### Set our gear as variables
 @setvar! jase_shrooms 0
 
@@ -412,7 +438,7 @@ if findlayer self outerbody as item
     @setvar! jase_outerbody item
 endif
 
-if jase_righthand = 0  and jase_lefthand = 0
+if jase_righthand = 0 and jase_lefthand = 0
     overhead "We do not see your weapon!" 34
 elseif find jase_righthand backpack
     dclick jase_righthand

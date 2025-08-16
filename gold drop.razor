@@ -51,3 +51,25 @@ if findtype 'gold coin' backpack as Coin
 endif
 droprelloc 0 0
 clearall 
+
+
+
+####
+#
+#
+###
+
+while findtype 3705 backpack 38 as found_pouch
+    overhead "FOUND TRAPPED POUCH" 33
+    getlabel found_pouch description
+    wait 100
+    overhead description 53
+    
+    if "(0 items, 0 stones)" in description
+        overhead "FOUND EMPTY POUCH" 53
+    endif
+    wait 1000
+endwhile 
+
+# move in backpack 
+# set id auto
