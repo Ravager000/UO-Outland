@@ -41,7 +41,7 @@ endif
 
 // OPEN untrapped pouches
 while findtype "pouch" backpack 0 as item
-    overhead "Open Untrapped Pouches" 89
+    //overhead "Open Untrapped Pouches" 89
     dclick item
     wait globalTimeout
     @ignore item
@@ -131,7 +131,7 @@ if findtype 5905|5899 jootbag as boots
     dclicktype "scissors" backpack
     wft 500
     target boots
-    wait 650
+    wait globalTimeout
     endif
 endif
 
@@ -186,7 +186,7 @@ endwhile
 
 if findtype "bank deposit safe" ground -1 -1 2 as safe
     menu safe 0
-    wait globalTimeout
+    wait 200
 endif
 
 if findtype "resource container" ground -1 -1 2 as resource
@@ -274,11 +274,13 @@ clearsysmsg
 if findtype "reagent satchel" self as jatchel
     overhead "Organize Satchel" 88
     menu jatchel 0
+    wait 200
 endif
 
 if findtype 31262 self as jpotsatchel
     overhead "Organize Potion Satchel" 88
     menu jpotsatchel 0
+    wait 200
 endif
 
 ### Set our gear as variables
