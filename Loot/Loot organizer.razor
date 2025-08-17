@@ -40,12 +40,12 @@ if not varexist jootbag or not find jootbag self 38
 endif
 
 // OPEN untrapped pouches
-while findtype "pouch" backpack 0 as item
-    //overhead "Open Untrapped Pouches" 89
-    dclick item
-    wait globalTimeout
-    @ignore item
-endwhile
+#while findtype "pouch" backpack 0 as item
+#    //overhead "Open Untrapped Pouches" 89
+#    dclick item
+#    wait globalTimeout
+#    @ignore item
+#endwhile
 
 #if find myHouseSign ground -1 -1 20
 #    dclick myHouseSign
@@ -270,18 +270,18 @@ endif
 #
 
 clearsysmsg 
-
-if findtype "reagent satchel" self as jatchel
-    overhead "Organize Satchel" 88
-    menu jatchel 0
-    wait 200
-endif
-
-if findtype 31262 self as jpotsatchel
-    overhead "Organize Potion Satchel" 88
-    menu jpotsatchel 0
-    wait 200
-endif
+#
+#if findtype "reagent satchel" self as jatchel
+#    overhead "Organize Satchel" 88
+#    menu jatchel 0
+#    wait 200
+#endif
+#
+#if findtype 31262 self as jpotsatchel
+#    overhead "Organize Potion Satchel" 88
+#    menu jpotsatchel 0
+#    wait 200
+#endif
 
 ### Set our gear as variables
 @setvar! jase_shrooms 0
