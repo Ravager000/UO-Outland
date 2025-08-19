@@ -5,6 +5,26 @@
 
 @setvar! globalTimeout 650
 
+@setvar! CleanRestock 1
+#Option to drop everything before restocking and organise
+
+if CleanRestock = 1
+#@ignore backpack
+while findtype 3705|30765|3702|31262|3701 backpack 
+if findtype "storage shelf|gothic storage shelf" ground -1 -1 2 as shelf
+    menu shelf 0
+    wft 500
+    target self
+    wait 200
+    gumpclose 3232825965
+endif
+wait 100
+if insysmsg 'That container does not'
+    break
+endif
+endwhile
+endif
+
 if not varexist jootbag or not find jootbag backpack 38
     #if counttype "bag" backpack = 1 and findtype "bag" backpack as lootbag
     #    overhead "jootbag: Automatically setting to bag"
