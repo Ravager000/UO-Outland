@@ -14,6 +14,8 @@
 @setvar! Chest2 0x55196970
 @setvar! myHouseSign 0x0
 @setvar! Itemindexer 1
+@setvar! Checkemptyp 1
+
 
 if not position 63 1570
     overhead "Not at home" 34
@@ -246,6 +248,29 @@ if findtype "storage shelf|gothic storage shelf|stump storage shelf" ground -1 -
     wait 200
 endif
 
+####
+#Find a non empty pouch move it and doubleclick it
+#
+####
+if Checkemptyp = 1
+@clearignore 
+while findtype 3705 backpack 38 as found_pouch
+    getlabel found_pouch description
+
+    if "(0 items, 0 stones)" in description or "(1 items, 1 stones)" in description
+        @ignore found_pouch
+    else
+        overhead "FOUND NOT EMPTY POUCH" 53
+        lift found_pouch 
+        wait 100
+        drop backpack 100 100 
+        wait 100
+        dclick found_pouch  
+      wait globalTimeout  
+    endif
+    
+endwhile
+endif
 # UO Outlands
 ## This script works together with LiftyLoot: https://outlands.uorazorscripts.com/script/aa177d50-6934-465f-873c-f7f619d96f1e
 ## Also is already inside Organizer Control Shift O: https://outlands.uorazorscripts.com/script/11fd0082-1e79-4aa8-8015-b62fac929481
