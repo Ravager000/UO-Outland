@@ -1,53 +1,48 @@
-
-# Drop off into a bag by Jaseowns
-# UO Outlands
-if not varexist golddropoff or not find golddropoff ground -1 -1 10
-    overhead "Where should items go?"
+@setvar! dropset 1
+if not varexist golddropoff
     @setvar! golddropoff
 endif
 
-@clearignore 
-while findtype "gold coin" backpack as jaseowns_Item    
-    if not find golddropoff ground -1 -1 2
-    overhead "No Bag close?"
-    break
+if dropset = 0 
+    # Set the drop location manually using option, edit variable
+elseif dropset = 1 and not find golddropoff ground -1 -1 10
+    # Ask for the drop location
+    overhead "Where should items go?"
+    @setvar! golddropoff
+
+elseif dropset = 2 and not find golddropoff ground -1 -1 10
+    # find a pouch in you inventory, setvar the pouch and lift and drop it on ground
+    if findtype "pouch" backpack as found_pouch
+    getlabel found_pouch description
+
+    if "(0 items, 0 stones)" in description
+        @setvar! golddropoff found_pouch
+        overhead "Pouch placed on ground and set" 53
+        lift found_pouch 
+        wait 100
+        drop found_pouch -1 -1 -1
+        wait 100
+        dclick found_pouch  
+      wait globalTimeout      
+    else
+        @ignore found_pouch
     endif
-    lift jaseowns_Item 60000
-    drop golddropoff -1 -1 -1
-    wait 650
-    @ignore jaseowns_Item
-endwhile
-@clearignore 
-
-#
-# Drop off into a bag by Jaseowns
-#   or ground
-
-
-if not varexist golddropoff or not find golddropoff ground -1 -1 10
-    overhead "Where should items go?"
-    @setvar! golddropoff
+    endif
 endif
 
-if cooldown 'PVP'
-if findtype 'gold coin' backpack as Coin
-    lift Coin 5000
-    if findtype 'gold coin' ground -1 -1 2 as GroundCoin
-       drop 'GroundCoin' -1 -1 1 
-       endif
-       droprelloc 0 0
- endif
-elseif varexist golddropoff and find golddropoff ground -1 -1 2
-    if findtype "gold coin" backpack as jaseowns_Item 
-    lift jaseowns_Item 60000
+if varexist golddropoff and find golddropoff ground -1 -1 2
+    if findtype "gold coin" backpack as Coin 
+    lift Coin 60000
     drop golddropoff -1 -1 -1
 else 
 say "[Oops"
 if findtype 'gold coin' backpack as Coin
-    lift Coin 500
+    lift Coin 1000
     if findtype 'gold coin' ground -1 -1 2 as GroundCoin
        drop 'GroundCoin' -1 -1 1 
        endif
+    droprelloc 0 0
 endif
-droprelloc 0 0
-clearall  
+
+clearall
+@clearignore   
