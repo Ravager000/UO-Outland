@@ -88,7 +88,7 @@ while findtype 400|401 'ground' -1 -1 10 as npc
     getlabel npc npcLabel
     if 'house steward' in npcLabel or 'innkeeper' in npcLabel
         //  overhead "Found ya!" 88 npc
-    say "Room"
+    //say "Room"
         menu npc 1
         waitforgump 2393832411
         if ingump "Enter Your Room" 2393832411
