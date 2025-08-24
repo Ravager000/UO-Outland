@@ -182,8 +182,10 @@ def display_inventory_data(items, merged_items, name, time):
     print(f"First timestamp: {time['first_time']}\n")
     print("====================== Inventory Summary ======================\n")
     print(f"Found {len(items)} total item types.\n")
-    total_amount = sum(item['amount'] for item in merged_items)
-    print(f"Total amount of items: {total_amount}\n")
+    # Subtract gold from total_amount
+    gold_amount = sum(item['amount'] for item in merged_items if item['id'] == "9999999999")
+    total_amount = sum(item['amount'] for item in merged_items) - gold_amount
+    print(f"Total amount of items (excluding gold): {total_amount}\n")
     for item in merged_items:
         print(f"(ID: {item['id']})  {item['description']}, Amount: {item['amount']}")
     print(f"\nTime played: {time['time_played']}\n")   
@@ -205,8 +207,9 @@ def save_Items_data(items, merged_items, output_dir, input_file_name, name, time
             f.write(f"First timestamp: {time['first_time']}\n")
             f.write("====================== Inventory Summary ======================\n")
             f.write(f"Found {len(items)} total items scaned, merged into {len(merged_items)} unique items type.\n\n")
-            total_amount = sum(item['amount'] for item in merged_items)
-            f.write(f"Total amount of items: {total_amount}\n\n")
+            gold_amount = sum(item['amount'] for item in merged_items if item['id'] == "9999999999")
+            total_amount = sum(item['amount'] for item in merged_items) - gold_amount
+            f.write(f"Total amount of items (excluding gold): {total_amount}\n\n")
             for item in merged_items:
                 f.write(f"(ID: {item['id']})  {item['description']}, Amount: {item['amount']}\n")
             f.write(f"\nTime played: {time['time_played']}\n")
