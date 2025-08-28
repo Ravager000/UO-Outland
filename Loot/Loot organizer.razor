@@ -160,14 +160,6 @@ if findtype "storage shelf|gothic storage shelf|stump storage shelf" ground -1 -
     gumpclose 3232825965
 endif
 
-if findtype "garden shelf" ground -1 -1 2 as gshelf
-    menu gshelf 0
-    wft 1000
-    wait 100
-    target backpack // 
-    wait 200   
-endif
-
 // our tomes
 dclick Chest1
 wait 200
@@ -198,6 +190,14 @@ if findtype "resource container" ground -1 -1 2 as resource
     target jootbag
     wait 200
 endif    
+
+if findtype "garden shelf" ground -1 -1 2 as gshelf
+    menu gshelf 0
+    wft 1000
+    wait 100
+    target backpack // 
+    wait 200   
+endif
 
 if findtype "ornate elven chest|magic item recycler" ground -1 -1 2 as recycler
     menu recycler 1
