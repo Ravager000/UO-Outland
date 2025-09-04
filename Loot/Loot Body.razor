@@ -7,6 +7,11 @@
 #######
 ##  -02/18/2023- 48 hour stream, we the best.
 ##  -01/16/2024- We updated on the 12th day of streaming in a row!
+#
+#
+#TODO: Loot armor to self layer
+    #   Loot priority to reag and pot/utility bag
+       # Heal after looting reag and pot/utility bag
 ####
 @setvar! globalTimeout 675
 @setvar! automaticallyActivateAspect 1
@@ -23,10 +28,10 @@ while findtype "corpse|bones" ground -1 -1 2 as jorpse
 endwhile
 @clearignore 
 
-if not varexist jootbag
-    overhead "I dunno your loot bag - Set it" 34
-    stop
-endif
+#if not varexist jootbag
+#    overhead "I dunno your loot bag - Set it" 34
+#    stop
+#endif
 
 //if not find jootbag backpack
     hotkey "Set Grab Item HotBag"
@@ -51,10 +56,93 @@ endif
 //    endif 
 //endif
 
+
+if jase_Bag != 0 and not find jase_Bag self
+    if not targetexists 
+        hotkey "Grab Item"
+        wft 500
+    endif
+    target jase_Bag
+    if not targetexists
+        wait globalTimeout
+    endif
+endif
+
+if jase_outerbody != 0 and not find jase_outerbody self
+    if not targetexists 
+        hotkey "Grab Item"
+        wft 500
+    endif
+    target jase_outerbody
+    if not targetexists
+        wait globalTimeout
+    endif
+endif
+
+# heal here  and not targetexists
+
+            if hp < maxhp
+                if findtype "Yellow Potion" backpack
+                    if timer "healpot" >= 8000
+                        overhead 'Drinking heal!'
+                        potion "heal"
+                        wait 200
+                        settimer "healpot" 0
+                    endif
+                else 
+                    overhead 'Out of heals!' 34
+                endif
+            endif
+            
+            if poisoned and hp < maxhp
+                if findtype "Orange Potion" backpack
+                    overhead 'Drinking cures!'
+                    potion "cure"
+                    wait 200
+                else 
+                    overhead 'Out of cures!' 34
+                endif
+            endif
+
+            if  skill "Healing" > 90 and hp < maxhp and not bandaging and findtype "clean bandage%s%" backpack
+                hotkey "Bandage Self"
+                wait 200
+            endif
+
+            
+if skill "Magery" > 90 and diffhits > 15 and mana >= 11
+    cast 'Greater Heal'
+    wft
+    target self
+endif         
+if skill "Magery" > 90 and diffhits <= 20 and mana >= 4
+    cast 'Heal'
+    wft
+    target self
+endif
+
+
+if jootbag != 0 and not find jootbag self
+    if not targetexists 
+        hotkey "Grab Item"
+        wft 500
+    endif
+    target jootbag
+    if not targetexists
+        wait globalTimeout
+    endif
+endif
+
 if jase_righthand != 0 and not find jase_righthand self
     // handle crooky 
-    dclick jase_righthand
-    wait globalTimeout
+     if not targetexists 
+        hotkey "Grab Item"
+        wft 500
+    endif
+    target jase_righthand
+    if not targetexists
+        wait globalTimeout
+    endif
 endif
 
 if jase_lefthand != 0 and not find jase_lefthand self
@@ -247,16 +335,6 @@ if jase_head != 0 and not find jase_head self
         wait globalTimeout
     endif
 endif
-if jase_outerbody != 0 and not find jase_outerbody self
-    if not targetexists 
-        hotkey "Grab Item"
-        wft 500
-    endif
-    target jase_outerbody
-    if not targetexists
-        wait globalTimeout
-    endif
-endif
 if jase_shirt != 0 and not find jase_shirt self
     if not targetexists 
         hotkey "Grab Item"
@@ -283,28 +361,6 @@ if jase_shoes != 0 and not find jase_shoes self
         wft 500
     endif
     target jase_shoes
-    if not targetexists
-        wait globalTimeout
-    endif
-endif
-
-if jase_Bag != 0 and not find jase_Bag self
-    if not targetexists 
-        hotkey "Grab Item"
-        wft 500
-    endif
-    target jase_Bag
-    if not targetexists
-        wait globalTimeout
-    endif
-endif
-
-if jootbag != 0 and not find jootbag self
-    if not targetexists 
-        hotkey "Grab Item"
-        wft 500
-    endif
-    target jootbag
     if not targetexists
         wait globalTimeout
     endif
@@ -363,9 +419,9 @@ if not findlayer self ring and jase_ring != 0
     wait globalTimeout
 endif
 if not findlayer self talisman and jase_talisman != 0
-     lift jase_talisman
-     wait globalTimeout
-     drop self talisman   
+     //lift jase_talisman
+     //wait globalTimeout
+     //drop self talisman   
 endif
 if not findlayer self neck and jase_neck != 0
     dclick jase_neck
