@@ -202,6 +202,10 @@ endif
 if findtype "ornate elven chest|magic item recycler" ground -1 -1 2 as recycler
     menu recycler 1
     wait 200
+    getlabel recycler myLabel
+    if "125 items" in myLabel
+       overhead "Recycler Full" 33 
+    endif
 endif
 
 if findtype "spellbook" self 0 as mySpellBook

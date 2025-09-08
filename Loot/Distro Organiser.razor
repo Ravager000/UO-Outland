@@ -3,8 +3,29 @@
 @setvar! gc 675
 
 @clearignore
+while findtype 3705 backpack 38 as found_pouch
+    getlabel found_pouch description
 
-overhead 'Select Destination' 187
+    if "(0 items, 0 stones)" in description 
+        @ignore found_pouch
+    else
+        overhead "FOUND NOT EMPTY POUCH" 53
+        lift found_pouch 
+        wait 100
+        drop backpack 100 100 
+        wait 100
+        dclick found_pouch  
+      wait 675  
+    endif
+    
+endwhile
+
+if findtype "repair bench" ground -1 -1 2 as bench
+    dclick bench
+    wait globalTimeout
+endif
+
+overhead 'Select Distro Chest' 187
 setvar DistroChest
 wait 150
 while targetexists 
@@ -94,7 +115,7 @@ while findtype 22336 backpack as item
 endwhile
 
 //carpet
-while findtype 'carpet' 'backpack' any
+while findtype 'carpet' backpack any
     @drop backpack
     lifttype 'carpet' 1 backpack any
     drop DistroChest 25 108 0
@@ -191,5 +212,18 @@ endwhile
 
 getlabel DistroChest DistroDesc
 overhead DistroDesc 88 DistroChest
+
+
+if findtype "ornate elven chest|magic item recycler" ground -1 -1 2 as recycler
+    menu recycler 1
+    wait 200
+    getlabel recycler myLabel
+    if "125 items" in myLabel
+       overhead "Recycler Full" 33 
+       # script name to recycle
+       # script 'ScriptName'
+    endif
+endif
+
 
 overhead 'Distribution Finished' 44
